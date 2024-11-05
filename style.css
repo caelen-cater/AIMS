@@ -20,7 +20,7 @@ h2 {
 }
 
 input[type="text"], input[type="password"] {
-    width: 100%;
+    width: calc(100% - 22px); /* Adjust width to fit within the container */
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
@@ -46,4 +46,17 @@ button:hover {
     text-align: center;
     font-weight: bold;
     color: #28a745;
+}
+
+#alertMessage {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: none; /* Initially hidden */
 }

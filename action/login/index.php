@@ -22,6 +22,7 @@ $response = curl_exec($ch);
 
 // Check for cURL errors
 if ($response === false) {
+    http_response_code(500);
     die('Curl error: ' . curl_error($ch));
 }
 
@@ -30,8 +31,12 @@ curl_close($ch);
 
 // Decode the response
 $responseData = json_decode($response, true);
+$storedHashedPassword = $responseData['data'];
 
-// Output the 'data' value as the hashed password
-header('Content-Type: application/json');
-echo json_encode(['data' => $responseData['data']]);
+// Validate the password
+if (password_verify($password, $storedHashedPassword)) {
+    http_response_code(200);
+} else {
+    http_response_code(429);
+}
 ?>

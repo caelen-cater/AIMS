@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const alertMessage = urlParams.get('alert');
     if (alertMessage) {
-        document.getElementById('alertMessage').textContent = alertMessage;
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = alertMessage;
+        alertDiv.style.display = 'block';
     }
 });
 
@@ -12,7 +14,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     const userId = document.getElementById('userId').value;
     const password = document.getElementById('password').value;
 
-    const response = await fetch(`../action/login/index.php`, {
+    const response = await fetch('../action/login/index.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -23,15 +25,13 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         })
     });
 
-    const result = await response.json();
-    const storedHashedPassword = result.data;
-
-    if (storedHashedPassword && await bcrypt.compare(password, storedHashedPassword)) {
-        const doubleHashedPassword = await bcrypt.hash(storedHashedPassword, 10);
-        localStorage.setItem('key', doubleHashedPassword);
-        document.cookie = `key=${doubleHashedPassword}; path=/;`;
+    if (response.status === 200) {
+        localStorage.setItem('user', userId); // Store user ID
+        localStorage.setItem('password', password); // Store password
         window.location.href = '../';
-    } else {
+    } else if (response.status === 429) {
         alert('Invalid user ID or password');
+    } else {
+        alert('An error occurred. Please try again.');
     }
 });
