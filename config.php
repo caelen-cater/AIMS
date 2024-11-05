@@ -1,4 +1,4 @@
 <?php
-$cirrusapi = "APIKEY";
+$cirrusapi = "CIRRUS API KEY";
 $volume = "6";
 ?>
