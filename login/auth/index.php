@@ -4,9 +4,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' || empty($_POST)) {
     exit();
 }
 
-require_once '../../../config.php';
-
-$apikey = $cirrusapi;
+$apikey = 'API_KEY';
 $api_url = 'https://api.cirrus.center/v2/auth/user/';
 
 $username = $_POST['username'];
