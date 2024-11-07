@@ -53,7 +53,8 @@ if ($first && $last) {
             'password' => $password,
             'first' => $first,
             'last' => $last,
-            'email' => $username
+            'email' => $username,
+            'generate' => false
         ]);
 
         $ch = curl_init($api_url);
