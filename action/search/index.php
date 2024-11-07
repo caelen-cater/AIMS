@@ -1,33 +1,30 @@
 <?php
-$headers = apache_request_headers();
-if (!isset($headers['Authorization'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+include '../../../config.php'; // Assuming this file contains $cirrusapi
 
-list($type, $data) = explode(' ', $headers['Authorization']);
-list($user, $password) = explode(':', base64_decode($data));
+$token = $_COOKIE['token']; // Assuming the token is stored in a cookie
 
-// Authenticate user
-$loginUrl = "https://caelen.dev/aims/action/login/";
-$loginResponse = file_get_contents($loginUrl, false, stream_context_create([
+$authUrl = "https://api.cirrus.center/v2/auth/user/";
+$options = [
     'http' => [
-        'method' => 'POST',
-        'header' => "Content-Type: application/json\r\n",
-        'content' => json_encode(['user' => $user, 'password' => $password])
+        'method' => 'GET',
+        'header' => [
+            "Authorization: Bearer $cirrusapi",
+            "Token: $token"
+        ]
     ]
-]));
+];
 
-$loginData = json_decode($loginResponse, true);
-if (!$loginData['success']) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
+$context = stream_context_create($options);
+$authResponse = file_get_contents($authUrl, false, $context);
+$authData = json_decode($authResponse, true);
+
+if ($http_response_header[0] == 'HTTP/1.1 401 Unauthorized') {
+    header('Location: ../../../login');
     exit;
 }
 
+$userid = $authData['user']['id'];
 $containerId = $_GET['containerId'];
-$userid = $user; // Use authenticated user ID
 $url = "https://api.cirrus.center/v2/data/database/?db=AIMS&log=$userid.$containerId";
 
 $response = file_get_contents($url);

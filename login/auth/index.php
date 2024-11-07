@@ -22,10 +22,9 @@ function handle_response($http_code, $response, $is_registration = false) {
         $response_data = json_decode($response, true);
         if (isset($response_data['token'])) {
             $token = $response_data['token'];
-            echo "<script>
-                    localStorage.setItem('token', '$token');
-                    window.location.href = 'callback';
-                  </script>";
+            setcookie('auth', $token, time() + (30 * 24 * 60 * 60), "/");
+            header('Location: callback');
+            exit();
         }
     } else if ($http_code == 401) {
         header('Location: ../?auth=failed');
