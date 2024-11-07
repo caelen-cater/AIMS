@@ -1,56 +1,96 @@
-const volume = 10; // Define the volume variable here
+const volume = 5; // Define the volume variable here
+let containerIdBuffer = '';
+let bufferTimeout;
 
-document.getElementById('containerIdInput').addEventListener('input', function() {
-    const containerId = this.value;
+document.addEventListener('keypress', function(event) {
+    if (event.target.id !== 'itemInput') { // Prevent adding Enter key from item input to buffer
+        containerIdBuffer += event.key;
 
-    if (containerId.length === volume) {
-        const user = localStorage.getItem('user');
-        const password = localStorage.getItem('password');
+        clearTimeout(bufferTimeout); // Clear the previous timeout
+        bufferTimeout = setTimeout(() => {
+            containerIdBuffer = ''; // Reset the buffer if no new digit is typed within the specified time
+        }, volume * 1000);
 
-        fetch(`action/search/index.php?containerId=${containerId}`, {
-            headers: {
-                'Authorization': 'Basic ' + btoa(user + ':' + password)
-            }
-        })
-        .then(response => response.json())
-        .then(data => displayGrid(data.data))
-        .catch(error => console.error('Error:', error));
+        if (containerIdBuffer.length === volume) {
+            search('container', containerIdBuffer);
+            containerIdBuffer = ''; // Reset the buffer after search
+        }
     }
 });
+
+document.getElementById('itemInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        const item = this.value;
+        if (item.length > 0) {
+            search('item', item);
+            containerIdBuffer = ''; // Reset the buffer to ensure container search works after item search
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    authenticateUser();
+});
+
+function authenticateUser() {
+    fetch('action/auth/', {
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = 'login';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function search(type, value) {
+    const user = localStorage.getItem('user');
+    const password = localStorage.getItem('password');
+
+    fetch(`action/search/?${type}=${value}`, {
+        headers: {
+            'Authorization': 'Basic ' + btoa(user + ':' + password)
+        }
+    })
+    .then(response => response.json())
+    .then(data => displayGrid(data.data))
+    .catch(error => console.error('Error:', error));
+}
 
 function displayGrid(data) {
     const gridContainer = document.getElementById('gridContainer');
     gridContainer.innerHTML = '';
 
-    for (const key in data) {
-        const item = data[key];
+    data.forEach((item, index) => {
         const gridItem = document.createElement('div');
         gridItem.className = 'grid-item';
+        gridItem.setAttribute('data-key', index + 1);
 
         const img = document.createElement('img');
-        img.src = item[1]; // Assuming URL is at index 1
+        img.src = item.url;
         gridItem.appendChild(img);
 
         const caption = document.createElement('div');
         caption.className = 'caption';
-        caption.textContent = item[2]; // Assuming caption is at index 2
+        caption.textContent = item.caption;
         gridItem.appendChild(caption);
 
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
-        deleteButton.textContent = 'X';
-        deleteButton.addEventListener('click', () => deleteItem(key));
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => deleteItem(index + 1));
         gridItem.appendChild(deleteButton);
 
         gridContainer.appendChild(gridItem);
-    }
+    });
 }
 
 function deleteItem(key) {
     const user = localStorage.getItem('user');
     const password = localStorage.getItem('password');
 
-    fetch(`action/delete/index.php?key=${key}`, {
+    fetch(`action/delete/?key=${key}`, {
         method: 'DELETE',
         headers: {
             'Authorization': 'Basic ' + btoa(user + ':' + password)

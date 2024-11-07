@@ -1,12 +1,19 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #393D49;
+    background-image: url('https://cdn.cirrus.center/static/noise.png');
+    color: #333;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .container {
-    width: 300px;
+    width: 90%;
+    max-width: 1200px;
     margin: 50px auto;
     padding: 20px;
     background-color: #fff;
@@ -20,7 +27,7 @@ h2 {
 }
 
 input[type="text"], input[type="password"] {
-    width: calc(100% - 22px); /* Adjust width to fit within the container */
+    width: calc(100% - 22px);
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
@@ -58,12 +65,12 @@ button:hover {
     left: 0;
     width: 100%;
     z-index: 1000;
-    display: none; /* Initially hidden */
+    display: none;
 }
 
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     margin-top: 20px;
 }
@@ -71,26 +78,35 @@ button:hover {
 .grid-item {
     position: relative;
     text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-item .delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    cursor: pointer;
+    padding: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    order: -1;
 }
 
 .grid-item img {
     width: 100%;
-    border-radius: 5px;
+    height: auto;
+    display: block;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .grid-item .caption {
     margin-top: 5px;
     font-size: 14px;
-}
-
-.grid-item .delete-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 5px;
 }
