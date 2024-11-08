@@ -1,6 +1,7 @@
 const volume = 5; // Define the volume variable here
 let containerIdBuffer = '';
 let bufferTimeout;
+let currentContainerId = '';
 
 document.addEventListener('keypress', function(event) {
     if (event.target.id !== 'itemInput') { // Prevent adding Enter key from item input to buffer
@@ -12,6 +13,7 @@ document.addEventListener('keypress', function(event) {
         }, volume * 1000);
 
         if (containerIdBuffer.length === volume) {
+            currentContainerId = containerIdBuffer;
             search('container', containerIdBuffer);
             containerIdBuffer = ''; // Reset the buffer after search
         }
@@ -48,7 +50,14 @@ function search(type, value) {
     const user = localStorage.getItem('user');
     const password = localStorage.getItem('password');
 
-    fetch(`action/search/?${type}=${value}`, {
+    let url;
+    if (type === 'container' && value === 'Enter') {
+        url = `action/search/?all=true`;
+    } else {
+        url = `action/search/?${type}=${value}`;
+    }
+
+    fetch(url, {
         headers: {
             'Authorization': 'Basic ' + btoa(user + ':' + password)
         }
@@ -66,6 +75,8 @@ function displayGrid(data) {
         const gridItem = document.createElement('div');
         gridItem.className = 'grid-item';
         gridItem.setAttribute('data-key', index + 1);
+        gridItem.setAttribute('data-container', item.containerId);
+        gridItem.setAttribute('data-entry', item.entryId);
 
         const img = document.createElement('img');
         img.src = item.url;
@@ -76,21 +87,27 @@ function displayGrid(data) {
         caption.textContent = item.caption;
         gridItem.appendChild(caption);
 
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'delete-button';
-        deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', () => deleteItem(index + 1));
-        gridItem.appendChild(deleteButton);
+        // Only add delete button if the currentContainerId matches the item's containerId
+        if (currentContainerId === item.containerId) {
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-button';
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => deleteItem(index + 1));
+            gridItem.appendChild(deleteButton);
+        }
 
         gridContainer.appendChild(gridItem);
     });
 }
 
-function deleteItem(key) {
+function deleteItem(entryId) {
     const user = localStorage.getItem('user');
     const password = localStorage.getItem('password');
+    const gridItem = document.querySelector(`.grid-item[data-key="${entryId}"]`);
+    const containerId = gridItem.getAttribute('data-container');
+    const entry = gridItem.getAttribute('data-entry');
 
-    fetch(`action/delete/?key=${key}`, {
+    fetch(`action/delete/?container=${containerId}&entry=${entry}`, {
         method: 'DELETE',
         headers: {
             'Authorization': 'Basic ' + btoa(user + ':' + password)
@@ -99,7 +116,7 @@ function deleteItem(key) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.querySelector(`.grid-item[data-key="${key}"]`).remove();
+            gridItem.remove();
         } else {
             console.error('Error deleting item:', data.message);
         }
