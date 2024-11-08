@@ -2,7 +2,7 @@
 require_once '../../config.php';
 
 if (!isset($_COOKIE['auth'])) {
-    header('Location: /login.php');
+    header('Location: ../../login');
     exit();
 }
 
