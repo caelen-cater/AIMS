@@ -7,7 +7,7 @@ if (!isset($_COOKIE['auth'])) {
 }
 
 $token = $_COOKIE['auth'];
-$apikey = $cirrusapi;
+$apikey = $apikey;
 
 // Get user ID
 $userInfo = file_get_contents("https://api.cirrus.center/v2/auth/user/", false, stream_context_create([

@@ -1,7 +1,7 @@
 <?php
 include '../../config.php';
 
-$apikey = $cirrusapi;
+$apikey = $apikey;
 $token = $_COOKIE['auth'];
 
 $ch = curl_init();
