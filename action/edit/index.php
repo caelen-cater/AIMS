@@ -40,15 +40,28 @@ $userInfo = json_decode($userInfo, true);
 $userId = $userInfo['user']['id'];
 
 $containerId = $_POST['containerId'] ?? null;
+$entryId = $_POST['entryId'] ?? null;
 $caption = $_POST['caption'] ?? null;
 $image = $_FILES['image'] ?? null;
 
-if (!$containerId || !$caption) {
-    echo json_encode(['success' => false, 'message' => 'Container ID and caption are required']);
+if (!$containerId || !$entryId) {
+    echo json_encode(['success' => false, 'message' => 'Container ID and entry ID are required']);
     exit();
 }
 
-$imageUrl = 'https://cdn.cirrus.center/static/placeholder.png';
+// Fetch existing entry data
+$data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$containerId}&entry={$entryId}", false, stream_context_create([
+    'http' => [
+        'header' => "Authorization: Bearer $apikey\r\n"
+    ]
+]));
+
+$data = json_decode($data, true);
+$existingEntry = $data['data'];
+$parts = explode('|', $existingEntry);
+
+$imageUrl = $parts[0]; // Retain the current image URL
+$currentCaption = $parts[1]; // Retain the current caption
 
 if ($image) {
     $ch = curl_init();
@@ -75,9 +88,13 @@ if ($image) {
     }
 }
 
-$entryData = "$imageUrl|$caption";
+if ($caption !== null) {
+    $currentCaption = $caption;
+}
 
-// Write to container database
+$newEntryData = "$imageUrl|$currentCaption";
+
+// Update container database
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -85,8 +102,8 @@ curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, [
     'db' => 'AIMS',
     'log' => "$userId$containerId",
-    'entry' => 'NA',
-    'value' => $entryData
+    'entry' => $entryId,
+    'value' => $newEntryData
 ]);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $apikey"
@@ -97,15 +114,12 @@ $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpcode != 200) {
-    echo json_encode(['success' => false, 'message' => 'Error writing to container database']);
+    echo json_encode(['success' => false, 'message' => 'Error updating container database']);
     exit();
 }
 
-$response = json_decode($response, true);
-$entryId = $response['entry'];
-
-// Write to user database
-$userEntryData = "$containerId|$entryId|$imageUrl|$caption";
+// Update user database
+$userEntryData = "$containerId|$entryId|$imageUrl|$currentCaption";
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
@@ -114,7 +128,7 @@ curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, [
     'db' => 'AIMS',
     'log' => $userId,
-    'entry' => 'NA',
+    'entry' => $entryId,
     'value' => $userEntryData
 ]);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -126,7 +140,7 @@ $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpcode != 200) {
-    echo json_encode(['success' => false, 'message' => 'Error writing to user database']);
+    echo json_encode(['success' => false, 'message' => 'Error updating user database']);
     exit();
 }
 
