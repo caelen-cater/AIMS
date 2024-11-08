@@ -57,7 +57,7 @@ document.getElementById('submitEntryButton').addEventListener('click', function(
     const photo = document.getElementById('photoInput').files[0];
     const submitButton = document.getElementById('submitEntryButton');
 
-    if (containerId && description) {
+    if (containerId.length === volume && description.length > 0) {
         const formData = new FormData();
         formData.append('containerId', containerId);
         formData.append('caption', description);
@@ -99,7 +99,7 @@ document.getElementById('submitEntryButton').addEventListener('click', function(
             console.error('Error:', error);
         });
     } else {
-        alert('Container ID and description are required');
+        alert(`Container ID must be ${volume} characters and description must be at least 1 character`);
     }
 });
 
@@ -148,7 +148,8 @@ document.getElementById('submitImageButton').addEventListener('click', function(
             console.error('Error:', error);
         });
     } else {
-        alert('Please select an image file');
+        document.getElementById('imageUploadForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
     }
 });
 
@@ -270,7 +271,11 @@ function makeCaptionEditable(captionElement, entryId) {
     input.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             const newText = input.value;
-            updateCaption(entryId, newText, captionElement);
+            if (newText.length > 0) {
+                updateCaption(entryId, newText, captionElement);
+            } else {
+                alert('Caption must be at least 1 character');
+            }
         }
     });
 
@@ -363,7 +368,8 @@ document.getElementById('submitImageButton').addEventListener('click', function(
         })
         .catch(error => console.error('Error:', error));
     } else {
-        alert('Please select an image file');
+        document.getElementById('imageUploadForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
     }
 });
 
