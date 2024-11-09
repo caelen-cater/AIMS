@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
@@ -264,42 +264,44 @@
 </head>
 <body>
 <div class="container" id="container">
-	<div class="form-container sign-up-container">
-		<form action="auth/" method="POST" onsubmit="return validatePassword()">
-			<h1>Create Account</h1>
-			<div class="name-container">
-				<input type="text" name="first" placeholder="First Name" />
-				<input type="text" name="last" placeholder="Last Name" />
-			</div>
-			<input type="email" name="username" placeholder="Email" />
-			<input type="password" name="password" placeholder="Password" maxlength="64" />
-			<input type="password" name="confirm_password" placeholder="Confirm Password" maxlength="64" />
-			<button type="submit">Sign Up</button>
-		</form>
-	</div>
-	<div class="form-container sign-in-container">
-		<form action="auth/" method="POST">
-			<h1>Sign in</h1>
-			<input type="email" name="username" placeholder="Email" />
-			<input type="password" name="password" placeholder="Password" maxlength="64" />
-			<button type="submit">Sign In</button>
-			<p class="error-message" id="error-message"></p>
-		</form>
-	</div>
-	<div class="overlay-container">
-		<div class="overlay">
-			<div class="overlay-panel overlay-left">
-				<h1>Welcome aboard!</h1>
-				<p>Ready to join the adventure?</p>
-				<button class="ghost" id="signIn">Or Sign In</button>
-			</div>
-			<div class="overlay-panel overlay-right">
-				<h1>Hello again!</h1>
-				<p>Let’s pick up where you left off.</p>
-				<button class="ghost" id="signUp">Or Sign Up</button>
-			</div>
-		</div>
-	</div>
+    <div class="form-container sign-up-container">
+        <form action="auth/" method="POST" onsubmit="return validatePassword()">
+            <h1>Welcome aboard!</h1>
+            <p>Ready to join the adventure?</p>
+            <div class="name-container">
+                <input type="text" name="first" placeholder="First Name" />
+                <input type="text" name="last" placeholder="Last Name" />
+            </div>
+            <input type="email" name="username" placeholder="Email" />
+            <input type="password" name="password" placeholder="Password" maxlength="64" />
+            <input type="password" name="confirm_password" placeholder="Confirm Password" maxlength="64" />
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+    <div class="form-container sign-in-container">
+        <form action="auth/" method="POST">
+            <h1>Hello again!</h1>
+            <p>Let’s pick up where you left off.</p>
+            <input type="email" name="username" placeholder="Email" />
+            <input type="password" name="password" placeholder="Password" maxlength="64" />
+            <button type="submit">Sign In</button>
+            <p class="error-message" id="error-message"></p>
+        </form>
+    </div>
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Hello again!</h1>
+                <p>Let’s pick up where you left off.</p>
+                <button class="ghost" id="signIn">Sign In</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Welcome aboard!</h1>
+                <p>Ready to join the adventure?</p>
+                <button class="ghost" id="signUp">Sign Up</button>
+            </div>
+        </div>
+    </div>
 </div>
 
   <script>
@@ -352,6 +354,22 @@
     if (urlParams.get('auth') === 'failed') {
       document.getElementById('error-message').innerText = 'Incorrect credentials';
     }
+
+    // Function to check token on page load
+    function checkToken() {
+      fetch('auth/token/')
+        .then(response => {
+          if (response.status === 200) {
+            window.location.href = 'auth/callback/';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    // Check token when the page loads
+    window.onload = checkToken;
   </script>
 </body>
 </html>
