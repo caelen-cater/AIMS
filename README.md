@@ -4,8 +4,9 @@ An Inventory Management System
 ## Installation Guide
 
 1. **Clone the repository:**
-   ``` bash
-git clone https://github.com/caelen-cater/AIMS```
+ ```bash
+git clone https://github.com/caelen-cater/AIMS
+```
 
 2. **Install dependencies:**
    Ensure you have PHP and a web server (like Apache or Nginx) installed.
