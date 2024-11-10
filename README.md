@@ -58,6 +58,9 @@ Learn about API keys [here](https://api.cirrus.center/docs/hc/articles/3/14/12/a
 - **Search Items:**
   Use the search functionality to find items and see which container they are in.
 
+- **Seach Everything:**
+  Search 'index' to display every AIMS entry
+
 ## API Keys
 
 Ensure you have set your API keys in the following files:
