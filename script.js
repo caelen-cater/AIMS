@@ -5,17 +5,19 @@ let currentContainerId = '';
 
 document.addEventListener('keypress', function(event) {
     if (event.target.id !== 'itemInput' && event.target.id !== 'containerIdInput' && event.target.id !== 'descriptionInput' && event.target.className !== 'caption-edit') { // Prevent adding Enter key from item input and add entries text box to buffer
-        containerIdBuffer += event.key;
+        if (event.key !== 'Enter') {
+            containerIdBuffer += event.key;
 
-        clearTimeout(bufferTimeout); // Clear the previous timeout
-        bufferTimeout = setTimeout(() => {
-            containerIdBuffer = ''; // Reset the buffer if no new digit is typed within the specified time
-        }, volume * 1000);
+            clearTimeout(bufferTimeout); // Clear the previous timeout
+            bufferTimeout = setTimeout(() => {
+                containerIdBuffer = ''; // Reset the buffer if no new digit is typed within the specified time
+            }, volume * 1000);
 
-        if (containerIdBuffer.length === volume) {
-            currentContainerId = containerIdBuffer;
-            search('container', containerIdBuffer);
-            containerIdBuffer = ''; // Reset the buffer after search
+            if (containerIdBuffer.length === volume) {
+                currentContainerId = containerIdBuffer;
+                search('container', containerIdBuffer);
+                containerIdBuffer = ''; // Reset the buffer after search
+            }
         }
     }
 });
@@ -196,12 +198,7 @@ function search(type, value) {
     const user = localStorage.getItem('user');
     const password = localStorage.getItem('password');
 
-    let url;
-    if (type === 'container' && value === 'Enter') {
-        url = `action/search/?all=true`;
-    } else {
-        url = `action/search/?${type}=${value}`;
-    }
+    const url = `action/search/?${type}=${value}`;
 
     fetch(url, {
         headers: {
