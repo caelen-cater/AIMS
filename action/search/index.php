@@ -46,6 +46,16 @@ $response = [
     'data' => []
 ];
 
+function matchesSearchQuery($itemDescription, $searchQuery) {
+    $searchWords = explode(' ', strtolower($searchQuery));
+    foreach ($searchWords as $word) {
+        if (stripos($itemDescription, $word) === false) {
+            return false;
+        }
+    }
+    return true;
+}
+
 if ($all) {
     // Fetch all data from the user database
     $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}", false, stream_context_create([
@@ -100,10 +110,11 @@ if ($all) {
 
     $data = json_decode($data, true);
 
-    foreach ($data['data'] as $containerId => $items) {
-        foreach ($items as $entryId => $itemEntry) {
-            $parts = explode('|', $itemEntry);
-            if (stripos($parts[3], $item) !== false) {
+    if (strtolower($item) === 'index') {
+        // Show all entries if the search query is "index"
+        foreach ($data['data'] as $containerId => $items) {
+            foreach ($items as $entryId => $itemEntry) {
+                $parts = explode('|', $itemEntry);
                 $response['data'][] = [
                     'containerId' => $containerId,
                     'entryId' => $entryId,
@@ -111,6 +122,22 @@ if ($all) {
                     'caption' => "$parts[0] - " . $parts[3]
                 ];
                 $response['total_entries']++;
+            }
+        }
+    } else {
+        foreach ($data['data'] as $containerId => $items) {
+            foreach ($items as $entryId => $itemEntry) {
+                $parts = explode('|', $itemEntry);
+                $itemDescription = strtolower($parts[3]);
+                if (matchesSearchQuery($itemDescription, $item)) {
+                    $response['data'][] = [
+                        'containerId' => $containerId,
+                        'entryId' => $entryId,
+                        'url' => str_replace('\/', '/', $parts[2]),
+                        'caption' => "$parts[0] - " . $parts[3]
+                    ];
+                    $response['total_entries']++;
+                }
             }
         }
     }

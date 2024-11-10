@@ -30,6 +30,24 @@ document.getElementById('itemInput').addEventListener('keypress', function(event
     }
 });
 
+document.getElementById('containerIdInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        const containerId = this.value;
+        if (containerId.length === volume) {
+            search('container', containerId);
+        }
+    }
+});
+
+document.getElementById('descriptionInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        const description = this.value;
+        if (description.length > 0) {
+            // Handle description input if needed
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     authenticateUser();
 });
@@ -188,7 +206,7 @@ function search(type, value) {
     fetch(url, {
         headers: {
             'Authorization': 'Basic ' + btoa(user + ':' + password),
-            cache: 'no-store' // Prevent caching
+            'Cache-Control': 'no-store' // Prevent caching
         }
     })
     .then(handleApiResponse)
