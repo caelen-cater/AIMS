@@ -1,6 +1,10 @@
 <?php
 require_once '../../config.php';
 
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 if (!isset($_COOKIE['auth'])) {
     http_response_code(401);
     exit();
