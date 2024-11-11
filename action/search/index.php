@@ -60,6 +60,33 @@ function matchesSearchQuery($itemDescription, $searchQuery) {
     return true;
 }
 
+// Enhanced function to handle flexible and intelligent matching
+function matchesSearchQueryEnhanced($itemDescription, $searchQuery) {
+    $searchWords = explode(' ', strtolower($searchQuery));
+    $itemWords = explode(' ', strtolower($itemDescription));
+    
+    foreach ($searchWords as $searchWord) {
+        $matchFound = false;
+        foreach ($itemWords as $itemWord) {
+            if (stripos($itemWord, $searchWord) !== false) {
+                $matchFound = true;
+                break;
+            }
+        }
+        if (!$matchFound) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Decode URL-encoded characters before matching
+function decodeAndMatch($itemDescription, $searchQuery) {
+    $decodedDescription = urldecode($itemDescription);
+    $decodedSearchQuery = urldecode($searchQuery);
+    return matchesSearchQueryEnhanced($decodedDescription, $decodedSearchQuery);
+}
+
 if ($all) {
     // Fetch all data from the user database
     $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}", false, stream_context_create([
@@ -133,7 +160,7 @@ if ($all) {
             foreach ($items as $entryId => $itemEntry) {
                 $parts = explode('|', $itemEntry);
                 $itemDescription = strtolower($parts[3]);
-                if (matchesSearchQuery($itemDescription, $item)) {
+                if (decodeAndMatch($itemDescription, $item)) {
                     $response['data'][] = [
                         'containerId' => $containerId,
                         'entryId' => $entryId,
