@@ -47,6 +47,101 @@ $containerId = $_POST['containerId'] ?? null;
 $entryId = $_POST['entryId'] ?? null;
 $caption = $_POST['caption'] ?? null;
 $image = $_FILES['image'] ?? null;
+$move = $_POST['move'] ?? null;
+
+if ($move) {
+    $oldContainerId = $_POST['oldContainerId'] ?? null;
+    $newContainerId = $_POST['newContainerId'] ?? null;
+
+    if (!$oldContainerId || !$newContainerId || !$entryId) {
+        echo json_encode(['success' => false, 'message' => 'Old Container ID, New Container ID, and entry ID are required']);
+        exit();
+    }
+
+    // Fetch existing entry data from old container
+    $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$oldContainerId}&entry={$entryId}", false, stream_context_create([
+        'http' => [
+            'header' => "Authorization: Bearer $apikey\r\n"
+        ]
+    ]));
+
+    $data = json_decode($data, true);
+    $existingEntry = $data['data'];
+
+    // Delete entry from old container
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$oldContainerId}&entry={$entryId}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $apikey"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpcode != 200) {
+        echo json_encode(['success' => false, 'message' => 'Error deleting entry from old container']);
+        exit();
+    }
+
+    // Add entry to new container
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, [
+        'db' => 'AIMS',
+        'log' => "$userId$newContainerId",
+        'entry' => 'NA',
+        'value' => $existingEntry
+    ]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $apikey"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpcode != 200) {
+        echo json_encode(['success' => false, 'message' => 'Error adding entry to new container']);
+        exit();
+    }
+
+    $response = json_decode($response, true);
+    $newEntryId = $response['entry'];
+
+    // Update user database
+    $userEntryData = "$newContainerId|$newEntryId|$existingEntry";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, [
+        'db' => 'AIMS',
+        'log' => $userId,
+        'entry' => $entryId,
+        'value' => $userEntryData
+    ]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $apikey"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpcode != 200) {
+        echo json_encode(['success' => false, 'message' => 'Error updating user database']);
+        exit();
+    }
+
+    echo json_encode(['success' => true]);
+    exit();
+}
 
 if (!$containerId || !$entryId) {
     echo json_encode(['success' => false, 'message' => 'Container ID and entry ID are required']);

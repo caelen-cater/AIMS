@@ -4,7 +4,7 @@ let bufferTimeout;
 let currentContainerId = '';
 
 document.addEventListener('keypress', function(event) {
-    if (event.target.id !== 'itemInput' && event.target.id !== 'containerIdInput' && event.target.id !== 'descriptionInput' && event.target.className !== 'caption-edit') { // Prevent adding Enter key from item input and add entries text box to buffer
+    if (event.target.id !== 'itemInput' && event.target.id !== 'containerIdInput' && event.target.id !== 'descriptionInput' && event.target.className !== 'caption-edit' && event.target.id !== 'moveContainerIdInput') { // Prevent adding Enter key from item input and add entries text box to buffer
         if (event.key !== 'Enter') {
             containerIdBuffer += event.key;
 
@@ -69,6 +69,7 @@ document.getElementById('overlay').addEventListener('click', function() {
     document.getElementById('addEntryForm').style.display = 'none';
     document.getElementById('imageUploadForm').style.display = 'none'; // Close the image upload form
     document.getElementById('overlay').style.display = 'none';
+    document.getElementById('moveEntryForm').style.display = 'none'; // Close the move entry form
 });
 
 document.getElementById('submitEntryButton').addEventListener('click', function() {
@@ -222,6 +223,26 @@ function displayGrid(data) {
         gridItem.setAttribute('data-container', item.containerId);
         gridItem.setAttribute('data-entry', item.entryId);
 
+        // Only add delete and move buttons if the currentContainerId matches the item's containerId
+        if (currentContainerId === item.containerId) {
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-button';
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => deleteItem(index + 1));
+            buttonContainer.appendChild(deleteButton);
+
+            const moveButton = document.createElement('button');
+            moveButton.className = 'move-button';
+            moveButton.textContent = '⇅';
+            moveButton.addEventListener('click', () => handleDoubleClick(event));
+            buttonContainer.appendChild(moveButton);
+
+            gridItem.appendChild(buttonContainer);
+        }
+
         const img = document.createElement('img');
         if (item.url && item.url.startsWith('http')) { // Ensure the URL is valid
             img.src = item.url;
@@ -234,15 +255,6 @@ function displayGrid(data) {
         caption.className = 'caption';
         caption.textContent = item.caption;
         gridItem.appendChild(caption);
-
-        // Only add delete button if the currentContainerId matches the item's containerId
-        if (currentContainerId === item.containerId) {
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-button';
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', () => deleteItem(index + 1));
-            gridItem.appendChild(deleteButton);
-        }
 
         gridContainer.appendChild(gridItem);
     });
@@ -388,6 +400,64 @@ document.getElementById('submitImageButton').addEventListener('click', function(
     }
 });
 
+document.getElementById('submitMoveButton').addEventListener('click', function() {
+    const moveContainerIdInput = document.getElementById('moveContainerIdInput');
+    const newContainerId = moveContainerIdInput.value;
+    const entryId = moveContainerIdInput.getAttribute('data-entry-id');
+    const oldContainerId = moveContainerIdInput.getAttribute('data-container-id');
+    const submitButton = document.getElementById('submitMoveButton');
+
+    if (newContainerId.length === volume) {
+        const formData = new FormData();
+        formData.append('oldContainerId', oldContainerId);
+        formData.append('newContainerId', newContainerId);
+        formData.append('entryId', entryId);
+        formData.append('move', true);
+
+        submitButton.textContent = 'Loading...';
+        submitButton.classList.add('loading');
+        submitButton.disabled = true;
+
+        fetch('action/edit/', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            cache: 'no-store' // Prevent caching
+        })
+        .then(handleApiResponse)
+        .then(data => {
+            submitButton.textContent = 'Submit';
+            submitButton.classList.remove('loading');
+            submitButton.disabled = false;
+
+            if (data.success) {
+                document.getElementById('moveEntryForm').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+                search('container', newContainerId); // Refresh the new container view
+            } else {
+                alert('Error moving entry: ' + data.message);
+            }
+        })
+        .catch(error => {
+            submitButton.textContent = 'Submit';
+            submitButton.classList.remove('loading');
+            submitButton.disabled = false;
+            console.error('Error:', error);
+        });
+    } else {
+        alert(`New Container ID must be ${volume} characters`);
+    }
+});
+
+document.getElementById('moveContainerIdInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        const newContainerId = this.value;
+        if (newContainerId.length === volume) {
+            // Handle move container ID input if needed
+        }
+    }
+});
+
 function handleDoubleClick(event) {
     const target = event.target;
     const gridItem = target.closest('.grid-item');
@@ -405,6 +475,14 @@ function handleDoubleClick(event) {
         overlay.style.display = 'block';
     } else if (target.classList.contains('caption')) {
         makeCaptionEditable(target, gridItem.getAttribute('data-entry'));
+    } else if (target.classList.contains('move-button')) {
+        const moveEntryForm = document.getElementById('moveEntryForm');
+        const overlay = document.getElementById('overlay');
+        const moveContainerIdInput = document.getElementById('moveContainerIdInput');
+        moveContainerIdInput.setAttribute('data-entry-id', gridItem.getAttribute('data-entry'));
+        moveContainerIdInput.setAttribute('data-container-id', gridItem.getAttribute('data-container'));
+        moveEntryForm.style.display = 'block';
+        overlay.style.display = 'block';
     }
 }
 
