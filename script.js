@@ -433,7 +433,11 @@ document.getElementById('submitMoveButton').addEventListener('click', function()
             if (data.success) {
                 document.getElementById('moveEntryForm').style.display = 'none';
                 document.getElementById('overlay').style.display = 'none';
-                search('container', newContainerId); // Refresh the new container view
+                moveContainerIdInput.value = ''; // Clear the input field
+                const movedItem = document.querySelector(`.grid-item[data-entry="${entryId}"]`);
+                if (movedItem) {
+                    movedItem.remove(); // Remove the moved item from the current container view
+                }
             } else {
                 alert('Error moving entry: ' + data.message);
             }
