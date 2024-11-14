@@ -132,7 +132,7 @@ button.loading:hover {
     order: -1;
     vertical-align: top;
     content: '⇅';
-    border-radius: 0; /* Remove rounding */
+    border-radius: 0;
 }
 
 .grid-item img {
