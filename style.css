@@ -110,11 +110,10 @@ button.loading:hover {
     background-color: red;
     color: white;
     border: none;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    border-radius: 0;
     cursor: pointer;
     padding: 3px;
-    width: calc(100% - 30px);
+    width: 100%;
     display: inline-block;
     box-sizing: border-box;
     order: -1;
@@ -133,14 +132,14 @@ button.loading:hover {
     order: -1;
     vertical-align: top;
     content: '⇅';
+    border-radius: 0; /* Remove rounding */
 }
 
 .grid-item img {
     width: 100%;
     height: auto;
     display: block;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    margin-top: -3px;
 }
 
 .grid-item .caption {
