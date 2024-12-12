@@ -15,7 +15,7 @@ $apikey = $apikey;
 
 // Validate token
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/auth/user/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $apikey",
@@ -32,7 +32,7 @@ if ($httpcode !== 200) {
 }
 
 // Get user ID
-$userInfo = file_get_contents("https://api.cirrus.center/v2/auth/user/", false, stream_context_create([
+$userInfo = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/", false, stream_context_create([
     'http' => [
         'header' => "Authorization: Bearer $apikey\r\nToken: $token\r\n"
     ]
@@ -89,7 +89,7 @@ function decodeAndMatch($itemDescription, $searchQuery) {
 
 if ($all) {
     // Fetch all data from the user database
-    $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}", false, stream_context_create([
+    $data = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}", false, stream_context_create([
         'http' => [
             'header' => "Authorization: Bearer $apikey\r\n"
         ]
@@ -111,7 +111,7 @@ if ($all) {
     }
 } elseif ($containerId) {
     // Fetch data from the database for container
-    $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$containerId}", false, stream_context_create([
+    $data = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}{$containerId}", false, stream_context_create([
         'http' => [
             'header' => "Authorization: Bearer $apikey\r\n"
         ]
@@ -133,7 +133,7 @@ if ($all) {
     }
 } elseif ($item) {
     // Fetch data from the database for item
-    $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log=$userId", false, stream_context_create([
+    $data = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log=$userId", false, stream_context_create([
         'http' => [
             'header' => "Authorization: Bearer $apikey\r\n"
         ]
