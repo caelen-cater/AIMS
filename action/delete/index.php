@@ -15,7 +15,7 @@ $apikey = $apikey;
 
 // Validate token
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/auth/user/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $apikey",
@@ -34,7 +34,7 @@ if ($httpcode !== 200) {
 $userId = null;
 
 // Get user ID
-$userInfo = file_get_contents("https://api.cirrus.center/v2/auth/user/", false, stream_context_create([
+$userInfo = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/", false, stream_context_create([
     'http' => [
         'header' => "Authorization: Bearer $apikey\r\nToken: $token\r\n"
     ]
@@ -48,7 +48,7 @@ $entryId = $_GET['entry'] ?? null;
 
 if ($containerId && $entryId) {
     // Fetch user database to find the correct container ID and entry ID
-    $userDbUrl = "https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}";
+    $userDbUrl = "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}";
 
     $userDbData = file_get_contents($userDbUrl, false, stream_context_create([
         'http' => [
@@ -63,7 +63,7 @@ if ($containerId && $entryId) {
             $parts = explode('|', $itemEntry);
             if ($parts[0] == $containerId && $parts[1] == $entryId) {
                 // Delete from container database
-                $url = "https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$parts[0]}&entry={$parts[1]}";
+                $url = "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}{$parts[0]}&entry={$parts[1]}";
 
                 $options = [
                     'http' => [
@@ -81,7 +81,7 @@ if ($containerId && $entryId) {
                 }
 
                 // Delete from user database
-                $deleteUrl = "https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}&entry={$entry}";
+                $deleteUrl = "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}&entry={$entry}";
 
                 $deleteOptions = [
                     'http' => [
