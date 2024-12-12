@@ -14,7 +14,7 @@ $apikey = $apikey;
 $token = $_COOKIE['auth'];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/auth/user/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $apikey",
