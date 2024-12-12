@@ -15,7 +15,7 @@ $apikey = $apikey;
 
 // Validate token
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/auth/user/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $apikey",
@@ -34,7 +34,7 @@ if ($httpcode !== 200) {
 $userId = null;
 
 // Get user ID
-$userInfo = file_get_contents("https://api.cirrus.center/v2/auth/user/", false, stream_context_create([
+$userInfo = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/", false, stream_context_create([
     'http' => [
         'header' => "Authorization: Bearer $apikey\r\nToken: $token\r\n"
     ]
@@ -59,7 +59,7 @@ if ($move) {
     }
 
     // Fetch existing entry data from old container
-    $data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$oldContainerId}&entry={$entryId}", false, stream_context_create([
+    $data = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}{$oldContainerId}&entry={$entryId}", false, stream_context_create([
         'http' => [
             'header' => "Authorization: Bearer $apikey\r\n"
         ]
@@ -70,7 +70,7 @@ if ($move) {
 
     // Delete entry from old container
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$oldContainerId}&entry={$entryId}");
+    curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}{$oldContainerId}&entry={$entryId}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -88,7 +88,7 @@ if ($move) {
 
     // Add entry to new container
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+    curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, [
@@ -117,7 +117,7 @@ if ($move) {
     $userEntryData = "$newContainerId|$newEntryId|$existingEntry";
 
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+    curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, [
@@ -149,7 +149,7 @@ if (!$containerId || !$entryId) {
 }
 
 // Fetch existing entry data
-$data = file_get_contents("https://api.cirrus.center/v2/data/database/?db=AIMS&log={$userId}{$containerId}&entry={$entryId}", false, stream_context_create([
+$data = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/?db=AIMS&log={$userId}{$containerId}&entry={$entryId}", false, stream_context_create([
     'http' => [
         'header' => "Authorization: Bearer $apikey\r\n"
     ]
@@ -164,7 +164,7 @@ $currentCaption = $parts[1]; // Retain the current caption
 
 if ($image) {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/upload/");
+    curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/upload/");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, [
@@ -195,7 +195,7 @@ $newEntryData = "$imageUrl|$currentCaption";
 
 // Update container database
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, [
@@ -221,7 +221,7 @@ if ($httpcode != 200) {
 $userEntryData = "$containerId|$entryId|$imageUrl|$currentCaption";
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, [
