@@ -15,7 +15,7 @@ $apikey = $apikey;
 
 // Validate token
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/auth/user/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $apikey",
@@ -34,7 +34,7 @@ if ($httpcode !== 200) {
 $userId = null;
 
 // Get user ID
-$userInfo = file_get_contents("https://api.cirrus.center/v2/auth/user/", false, stream_context_create([
+$userInfo = file_get_contents("https://michael.sparrow.us-east.cirrusapi.com/v2/auth/user/", false, stream_context_create([
     'http' => [
         'header' => "Authorization: Bearer $apikey\r\nToken: $token\r\n"
     ]
@@ -56,7 +56,7 @@ $imageUrl = 'https://cdn.cirrus.center/static/placeholder.png';
 
 if ($image) {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/upload/");
+    curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/upload/");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, [
@@ -83,7 +83,7 @@ $entryData = "$imageUrl|$caption";
 
 // Write to container database
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, [
@@ -112,7 +112,7 @@ $entryId = $response['entry'];
 $userEntryData = "$containerId|$entryId|$imageUrl|$caption";
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://api.cirrus.center/v2/data/database/");
+curl_setopt($ch, CURLOPT_URL, "https://michael.sparrow.us-east.cirrusapi.com/v2/data/database/");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, [
